@@ -1,4 +1,4 @@
-name: Build
+﻿name: Build
 
 on:
   push:
@@ -9,27 +9,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        java: [ '17', '21' ]
-    
+        java: [ '21' ]
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
         cache: gradle
-    
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    
+
     - name: Build with Gradle
       run: ./gradlew build
-    
+
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
@@ -41,20 +41,20 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
+
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: gradle
-    
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    
+
     - name: Publish to Maven Central Snapshots
       run: ./gradlew publish
       env:

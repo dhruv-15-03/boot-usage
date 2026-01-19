@@ -11,7 +11,7 @@ description = 'Spring Boot starter for runtime usage analysis and dependency opt
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 	withSourcesJar()
 	withJavadocJar()
