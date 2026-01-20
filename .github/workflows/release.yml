@@ -21,6 +21,8 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: gradle
+        server-id: github
+        settings-path: ${{ github.workspace }}
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -28,13 +30,21 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Setup Gradle credentials
+    - name: Debug - Show environment
       run: |
-        echo "gpr.user=${{ github.actor }}" >> gradle.properties
-        echo "gpr.key=${{ secrets.GITHUB_TOKEN }}" >> gradle.properties
+        echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+        echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+        echo "Token length: ${#GITHUB_TOKEN}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish to GitHub Packages
       run: ./gradlew publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        ORG_GRADLE_PROJECT_gpr.user: ${{ github.actor }}
+        ORG_GRADLE_PROJECT_gpr.key: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
