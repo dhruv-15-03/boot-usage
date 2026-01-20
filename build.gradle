@@ -80,8 +80,8 @@ maven {
 name = 'GitHubPackages'
 url = uri('https://maven.pkg.github.com/dhruv-15-03/boot-usage')
 credentials {
-username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR') ?: ''
-password = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN') ?: ''
+username = System.getenv('GPR_USER') ?: ''
+password = System.getenv('GPR_TOKEN') ?: ''
 }
 }
 }
