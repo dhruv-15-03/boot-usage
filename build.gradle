@@ -1,4 +1,4 @@
-﻿plugins {
+plugins {
 id 'java-library'
 id 'maven-publish'
 id 'signing'
@@ -48,59 +48,34 @@ test {
 useJUnitPlatform()
 }
 
-// Publishing configuration for Maven Central
 publishing {
 publications {
 mavenJava(MavenPublication) {
 from components.java
-
 pom {
 name = 'Boot Usage Spring Boot Starter'
 description = project.description
 url = 'https://github.com/dhruv-15-03/boot-usage'
-inceptionYear = '2024'
-
 licenses {
 license {
 name = 'Apache License, Version 2.0'
 url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
 }
 }
-
 developers {
 developer {
 id = 'dhruv1503'
 name = 'Dhruv Rastogi'
 email = 'dhruvrastogi2004@gmail.com'
-url = 'https://github.com/dhruv-15-03'
 }
 }
-
 scm {
-connection = 'scm:git:git://github.com/dhruv-15-03/boot-usage.git'
-developerConnection = 'scm:git:ssh://github.com/dhruv-15-03/boot-usage.git'
 url = 'https://github.com/dhruv-15-03/boot-usage'
 }
-
-issueManagement {
-system = 'GitHub Issues'
-url = 'https://github.com/dhruv-15-03/boot-usage/issues'
 }
 }
 }
-}
-
 repositories {
-maven {
-name = 'OSSRH'
-def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-credentials {
-username = System.getenv('OSSRH_USERNAME') ?: ''
-password = System.getenv('OSSRH_PASSWORD') ?: ''
-}
-}
 maven {
 name = 'GitHubPackages'
 url = 'https://maven.pkg.github.com/dhruv-15-03/boot-usage'
