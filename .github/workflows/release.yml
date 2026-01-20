@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     steps:
     - uses: actions/checkout@v4
@@ -25,8 +28,17 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Publish to Maven Central
-      run: ./gradlew publish
+    - name: Publish to GitHub Packages
+      run: ./gradlew publishMavenJavaPublicationToGitHubPackagesRepository
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+    - name: Publish to Maven Central (OSSRH)
+      run: ./gradlew publishMavenJavaPublicationToOSSRHRepository
+      continue-on-error: true
       env:
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
