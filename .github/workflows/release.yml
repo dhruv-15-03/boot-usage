@@ -31,8 +31,8 @@ jobs:
     - name: Publish to GitHub Packages
       run: ./gradlew publish
       env:
-        GPR_USER: ${{ github.actor }}
-        GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GPR_USER: ${{ github.repository_owner }}
+        GPR_TOKEN: ${{ secrets.GH_PAT }}
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
