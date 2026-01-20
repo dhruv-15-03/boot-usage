@@ -1,1 +1,97 @@
-plugins {id 'java-library'id 'maven-publish'id 'signing'id 'io.spring.dependency-management' version '1.1.6'}group = 'io.github.dhruv1503'version = '1.0.1'description = 'Spring Boot starter for runtime usage analysis and dependency optimization'java {toolchain {languageVersion = JavaLanguageVersion.of(21)}withSourcesJar()withJavadocJar()}repositories {mavenCentral()}ext {springBootVersion = '3.3.5'}dependencies {api platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")api 'org.springframework.boot:spring-boot-autoconfigure'compileOnly 'org.springframework.boot:spring-boot-actuator'compileOnly 'com.fasterxml.jackson.core:jackson-databind'annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'testImplementation 'org.springframework.boot:spring-boot-starter-test'testImplementation 'org.springframework.boot:spring-boot-starter-actuator'testImplementation 'org.springframework.boot:spring-boot-starter-web'}tasks.withType(JavaCompile).configureEach {options.encoding = 'UTF-8'options.compilerArgs << '-parameters'}test {useJUnitPlatform()}publishing {publications {mavenJava(MavenPublication) {from components.javapom {name = 'Boot Usage Spring Boot Starter'description = project.descriptionurl = 'https://github.com/dhruv-15-03/boot-usage'licenses {license {name = 'Apache License, Version 2.0'url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'}}developers {developer {id = 'dhruv1503'name = 'Dhruv Rastogi'email = 'dhruvrastogi2004@gmail.com'}}scm {url = 'https://github.com/dhruv-15-03/boot-usage'}}}}repositories {maven {name = 'GitHubPackages'url = uri('https://maven.pkg.github.com/dhruv-15-03/boot-usage')credentials {username = System.getenv('GPR_USER') ?: ''password = System.getenv('GPR_TOKEN') ?: ''}}}}signing {def signingKey = System.getenv('SIGNING_KEY')def signingPassword = System.getenv('SIGNING_PASSWORD')if (signingKey) {useInMemoryPgpKeys(signingKey, signingPassword)sign publishing.publications.mavenJava}}
+﻿plugins {
+id 'java-library'
+id 'maven-publish'
+id 'signing'
+id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'io.github.dhruv1503'
+version = '1.0.1'
+description = 'Spring Boot starter for runtime usage analysis and dependency optimization'
+
+java {
+toolchain {
+languageVersion = JavaLanguageVersion.of(21)
+}
+withSourcesJar()
+withJavadocJar()
+}
+
+repositories {
+mavenCentral()
+}
+
+ext {
+springBootVersion = '3.3.5'
+}
+
+dependencies {
+api platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
+api 'org.springframework.boot:spring-boot-autoconfigure'
+compileOnly 'org.springframework.boot:spring-boot-actuator'
+compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+testImplementation 'org.springframework.boot:spring-boot-starter-test'
+testImplementation 'org.springframework.boot:spring-boot-starter-actuator'
+testImplementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+tasks.withType(JavaCompile).configureEach {
+options.encoding = 'UTF-8'
+options.compilerArgs << '-parameters'
+}
+
+test {
+useJUnitPlatform()
+}
+
+publishing {
+publications {
+mavenJava(MavenPublication) {
+from components.java
+pom {
+name = 'Boot Usage Spring Boot Starter'
+description = project.description
+url = 'https://github.com/dhruv-15-03/boot-usage'
+licenses {
+license {
+name = 'Apache License, Version 2.0'
+url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+}
+}
+developers {
+developer {
+id = 'dhruv1503'
+name = 'Dhruv Rastogi'
+email = 'dhruvrastogi2004@gmail.com'
+}
+}
+scm {
+url = 'https://github.com/dhruv-15-03/boot-usage'
+}
+}
+}
+}
+repositories {
+maven {
+name = 'GitHubPackages'
+url = uri('https://maven.pkg.github.com/dhruv-15-03/boot-usage')
+credentials {
+username = System.getenv('GPR_USER') ?: ''
+password = System.getenv('GPR_TOKEN') ?: ''
+}
+}
+}
+}
+
+signing {
+def signingKey = System.getenv('SIGNING_KEY')
+def signingPassword = System.getenv('SIGNING_PASSWORD')
+if (signingKey) {
+useInMemoryPgpKeys(signingKey, signingPassword)
+sign publishing.publications.mavenJava
+}
+}
