@@ -28,10 +28,19 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Publish to GitHub Packages
-      run: ./gradlew publish
+    - name: Debug credentials
+      run: |
+        echo "GPR_USER: $GPR_USER"
+        echo "GPR_TOKEN length: ${#GPR_TOKEN}"
+        echo "Token starts with: ${GPR_TOKEN:0:4}..."
       env:
-        GPR_USER: ${{ github.repository_owner }}
+        GPR_USER: ${{ github.actor }}
+        GPR_TOKEN: ${{ secrets.GH_PAT }}
+
+    - name: Publish to GitHub Packages
+      run: ./gradlew publish --info
+      env:
+        GPR_USER: ${{ github.actor }}
         GPR_TOKEN: ${{ secrets.GH_PAT }}
 
     - name: Create GitHub Release
