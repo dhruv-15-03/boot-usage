@@ -1,4 +1,4 @@
-# Boot Usage Spring Boot Starter
+﻿# Boot Usage Spring Boot Starter
 
 [![Build Status](https://github.com/dhruv-15-03/boot-usage/actions/workflows/build.yml/badge.svg)](https://github.com/dhruv-15-03/boot-usage/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.dhruv1503/boot-usage-spring-boot-starter.svg)](https://search.maven.org/artifact/io.github.dhruv1503/boot-usage-spring-boot-starter)
@@ -30,14 +30,14 @@ This is invaluable for optimizing your application's dependencies and reducing b
 <dependency>
     <groupId>io.github.dhruv1503</groupId>
     <artifactId>boot-usage-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.dhruv1503:boot-usage-spring-boot-starter:1.0.0'
+implementation 'io.github.dhruv1503:boot-usage-spring-boot-starter:1.0.3'
 ```
 
 ## Usage
