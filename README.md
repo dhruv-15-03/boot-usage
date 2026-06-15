@@ -1,7 +1,7 @@
 ﻿# Boot Usage Spring Boot Starter
 
 [![Build Status](https://github.com/dhruv-15-03/boot-usage/actions/workflows/build.yml/badge.svg)](https://github.com/dhruv-15-03/boot-usage/actions/workflows/build.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.dhruv1503/boot-usage-spring-boot-starter.svg)](https://search.maven.org/artifact/io.github.dhruv1503/boot-usage-spring-boot-starter)
+[![JitPack](https://jitpack.io/v/dhruv-15-03/boot-usage.svg)](https://jitpack.io/#dhruv-15-03/boot-usage)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Spring Boot starter that provides runtime analysis of starter usage in your application. It helps you identify:
@@ -27,17 +27,30 @@ This is invaluable for optimizing your application's dependencies and reducing b
 ### Maven
 
 ```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
 <dependency>
-    <groupId>io.github.dhruv1503</groupId>
-    <artifactId>boot-usage-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <groupId>com.github.dhruv-15-03</groupId>
+    <artifactId>boot-usage</artifactId>
+    <version>v1.0.3</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.dhruv1503:boot-usage-spring-boot-starter:1.0.3'
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.dhruv-15-03:boot-usage:v1.0.3'
+}
 ```
 
 ## Usage
@@ -160,7 +173,7 @@ When `spring.boot.usage.policies-fail-on-violation=true`, any policy violation w
 
 ## Requirements
 
-- Java 17 or later
+- Java 21 or later
 - Spring Boot 3.2.0 or later
 
 ## Building from Source
