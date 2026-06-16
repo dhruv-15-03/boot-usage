@@ -1,91 +1,67 @@
-# Publishing to Maven Central
+# Publishing & Distribution
 
-This guide explains how to publish boot-usage-spring-boot-starter to Maven Central.
+`boot-usage` is distributed through two channels. Pick the right one for your use case:
 
-## Prerequisites
+| Channel | Coordinate | Auth | Notes |
+|---------|------------|------|-------|
+| **JitPack** (recommended for consumers) | `com.github.dhruv-15-03:boot-usage:v1.0.3` | None | Built on demand from the tagged source. Ready-to-paste snippets are in the [README](README.md). |
+| **GitHub Packages** | `io.github.dhruv1503:boot-usage-spring-boot-starter:1.0.3` | GitHub PAT (`read:packages`) | Published automatically by CI on every release tag. |
 
-### 1. Create a Sonatype OSSRH Account
+> **Maven Central is not used.** The artifact is **not** published to `repo1.maven.org`. See [Future: Maven Central](#future-maven-central-not-active) below if that ever changes.
 
-1. Go to https://central.sonatype.org/register/central-portal/
-2. Sign in with GitHub (recommended) or create account
-3. Verify your namespace: `io.github.dhruv1503`
-   - Since you're using `io.github.dhruv1503`, verification is automatic via GitHub
+## How a release is published (current)
 
-### 2. Generate GPG Keys
-
-```bash
-# Install GPG (Windows: use Gpg4win)
-# Generate a key pair
-gpg --full-generate-key
-
-# Choose: RSA and RSA, 4096 bits, no expiration
-# Enter: Dhruv Rastogi <dhruvrastogi2004@gmail.com>
-
-# List your keys
-gpg --list-secret-keys --keyid-format LONG
-
-# Export your public key to a keyserver
-gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEY_ID
-gpg --keyserver keys.openpgp.org --send-keys YOUR_KEY_ID
-
-# Export private key for CI (base64 encoded)
-gpg --export-secret-keys YOUR_KEY_ID | base64 > private-key.txt
-```
-
-### 3. Configure GitHub Secrets
-
-Go to https://github.com/dhruv-15-03/boot-usage/settings/secrets/actions
-
-Add these secrets:
-
-| Secret Name | Value |
-|-------------|-------|
-| `OSSRH_USERNAME` | Your Sonatype Central username |
-| `OSSRH_PASSWORD` | Your Sonatype Central token |
-| `GPG_PRIVATE_KEY` | Base64 encoded private key |
-| `GPG_PASSPHRASE` | Your GPG key passphrase |
-
-### 4. Publish a Release
+Releases are automated by [`.github/workflows/release.yml`](.github/workflows/release.yml), which triggers on any pushed `v*` tag:
 
 ```bash
-# Update version in build.gradle (remove -SNAPSHOT for release)
-# Commit and tag
-git add .
-git commit -m "Release v1.0.0"
-git tag v1.0.0
+# 1. Bump `version` in build.gradle, then:
+git commit -am "chore: bump version to X.Y.Z"
+git tag vX.Y.Z
 git push origin main --tags
 ```
 
-The GitHub Actions release workflow will:
-1. Build the project
-2. Sign artifacts with GPG
-3. Publish to Maven Central
+The workflow then:
 
-### 5. Manual Publishing (Alternative)
+1. Builds the project with **JDK 21** (Temurin).
+2. Runs `./gradlew publish`, pushing the artifact to **GitHub Packages**
+   (`https://maven.pkg.github.com/dhruv-15-03/boot-usage`).
+3. Creates a GitHub Release with the built JARs attached.
 
-```bash
-# Set environment variables
-export OSSRH_USERNAME=your-username
-export OSSRH_PASSWORD=your-token
-export GPG_SIGNING_KEY=your-key-id
-export GPG_PASSPHRASE=your-passphrase
+JitPack needs no release step of its own — it builds the same tag on first request.
 
-# Publish
-./gradlew publishToMavenCentral
-```
+### Required secret
 
-## After Publishing
+| Secret | Used for |
+|--------|----------|
+| `GH_PAT` | A GitHub Personal Access Token with `write:packages`, used by the GitHub Packages publish step. |
 
-1. Log into https://central.sonatype.com
-2. Go to Deployments
-3. Find your staging repository
-4. Click "Publish" to release to Maven Central
+## Consuming the library
 
-It takes about 30 minutes to appear on Maven Central, and up to 4 hours to sync to search.maven.org.
+Full Maven and Gradle snippets live in the [README](README.md). In short:
+
+- **JitPack (no auth):** add `https://jitpack.io` as a repository and depend on
+  `com.github.dhruv-15-03:boot-usage:v1.0.3`.
+- **GitHub Packages (auth required):** add `https://maven.pkg.github.com/dhruv-15-03/boot-usage`
+  with a GitHub PAT, and depend on `io.github.dhruv1503:boot-usage-spring-boot-starter:1.0.3`.
 
 ## Verification
 
 ```bash
-# Check if published
-curl "https://repo1.maven.org/maven2/io/github/dhruv1503/boot-usage-spring-boot-starter/maven-metadata.xml"
+# JitPack (public, no auth) - should return HTTP 200
+curl -sI "https://jitpack.io/com/github/dhruv-15-03/boot-usage/v1.0.3/boot-usage-v1.0.3.pom"
 ```
+
+## Future: Maven Central (not active)
+
+Maven Central is **not** configured today; `build.gradle` has no `publishToMavenCentral`
+task and the release workflow does not target it. If the project later publishes to
+Central under the `io.github.dhruv1503` namespace, it would require:
+
+1. A [Sonatype Central](https://central.sonatype.org/register/central-portal/) account
+   (namespace `io.github.dhruv1503` is GitHub-verifiable).
+2. GPG signing — the `signing` plugin is already wired into `build.gradle` and activates
+   when a `SIGNING_KEY` is present.
+3. A Central Portal publishing step plus the matching CI secrets
+   (`OSSRH_USERNAME`, `OSSRH_PASSWORD`, `GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`).
+
+Until that work is done, treat Maven Central references anywhere as aspirational.

@@ -34,7 +34,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 git clone https://github.com/YOUR_USERNAME/boot-usage.git
 cd boot-usage
 
-# Build
+# Build (requires JDK 21+)
 ./gradlew build
 
 # Run tests
