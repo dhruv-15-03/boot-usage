@@ -8,9 +8,9 @@
     },
     {
       "name": "spring.boot.usage.report.cache-ttl",
-      "type": "java.time.Duration",
-      "defaultValue": "0ms",
-      "description": "Endpoint cache TTL. 0 disables caching."
+      "type": "java.lang.Long",
+      "defaultValue": 0,
+      "description": "Endpoint cache TTL in milliseconds. 0 disables caching."
     },
     {
       "name": "spring.boot.usage.report.include-origins",
@@ -43,7 +43,7 @@
       "description": "Output directory for persisted reports."
     },
     {
-      "name": "spring.boot.usage.report.policies.fail-on-violation",
+      "name": "spring.boot.usage.report.policies-fail-on-violation",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "Fail startup on first policy violation (not enabled by default in this starter)."
