@@ -55,7 +55,22 @@ dependencies {
 
 ## Usage
 
-Once added to your project, the starter automatically registers an actuator endpoint.
+The feature is **disabled by default**. To turn it on, set `spring.boot.usage.report.enabled=true`
+and expose the `bootusage` actuator endpoint over the web:
+
+```yaml
+spring:
+  boot:
+    usage:
+      report:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bootusage
+```
 
 ### Accessing the Endpoint
 
@@ -69,31 +84,94 @@ curl http://localhost:8080/actuator/bootusage?force=true
 
 ### Sample Response
 
+> The structure below reflects the actual endpoint output. The `beanOrigins` section is
+> only present when `spring.boot.usage.report.include-origins=true`.
+
 ```json
 {
-  "usedStarters": [
+  "schemaVersion": "1.0.0",
+  "metadata": {
+    "generatedAt": "2025-01-15T12:34:56.789Z",
+    "schemaVersion": "1.0.0",
+    "springBootVersion": "3.3.5",
+    "javaVersion": "21.0.5",
+    "applicationName": "my-app",
+    "activeProfiles": ["default"],
+    "enabledFeatures": ["bean-origins", "unused-jar-detection"]
+  },
+  "configuration": {
+    "enabled": true,
+    "includeOrigins": true,
+    "includeConfidence": false,
+    "detectUnusedJars": true,
+    "markdownSummary": false,
+    "outputDir": "build/boot-usage",
+    "policiesFailOnViolation": false,
+    "cacheTtlMs": 0
+  },
+  "autoConfiguration": {
+    "applied": ["org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration"],
+    "appliedCount": 45,
+    "skipped": ["org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration"],
+    "skippedCount": 12,
+    "skippedDetails": [
+      {
+        "className": "org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration",
+        "reasons": ["@ConditionalOnClass did not find required class 'org.springframework.data.redis.core.RedisOperations'"]
+      }
+    ],
+    "exclusions": []
+  },
+  "starters": {
+    "used": [
+      {
+        "name": "spring-boot-starter-web",
+        "coordinate": "org.springframework.boot:spring-boot-starter-web:3.3.5",
+        "groupId": "org.springframework.boot",
+        "artifactId": "spring-boot-starter-web",
+        "version": "3.3.5",
+        "category": "web",
+        "location": "spring-boot-starter-web-3.3.5.jar",
+        "status": "USED"
+      }
+    ],
+    "usedCount": 1,
+    "unused": [],
+    "unusedCount": 0,
+    "indeterminate": [],
+    "indeterminateCount": 0,
+    "totalDetected": 1,
+    "analysisMetadata": {
+      "matchedAutoConfigurations": 45,
+      "excludedAutoConfigurations": 12
+    }
+  },
+  "beanOrigins": [
     {
-      "name": "spring-boot-starter-web",
-      "groupId": "org.springframework.boot",
-      "artifactId": "spring-boot-starter-web",
-      "version": "3.3.5",
-      "status": "USED",
-      "category": "web"
+      "bean": "myController",
+      "definitionLocation": "com/example/MyController.class",
+      "codeSource": "/app/classes",
+      "type": "com.example.MyController",
+      "scope": "singleton"
     }
   ],
-  "unusedStarters": [
-    {
-      "name": "spring-boot-starter-data-redis",
-      "groupId": "org.springframework.boot",
-      "artifactId": "spring-boot-starter-data-redis",
-      "version": "3.3.5",
-      "status": "UNUSED",
-      "category": "data"
-    }
-  ],
-  "indeterminateStarters": [],
-  "matchedAutoConfigCount": 45,
-  "excludedAutoConfigCount": 12
+  "suggestions": {
+    "unusedStarters": [],
+    "optimizationTips": []
+  },
+  "summary": {
+    "totalBeans": 180,
+    "singletonBeans": 178,
+    "prototypeBeans": 2,
+    "appliedAutoConfigurations": 45,
+    "skippedAutoConfigurations": 12,
+    "totalStarters": 1,
+    "usedStarters": 1,
+    "unusedStarters": 0,
+    "indeterminateStarters": 0,
+    "starterEfficiencyPercent": 100
+  },
+  "policyViolations": []
 }
 ```
 
@@ -101,32 +179,38 @@ curl http://localhost:8080/actuator/bootusage?force=true
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `management.endpoint.bootusage.enabled` | boolean | `true` | Enable/disable the bootusage endpoint |
-| `spring.boot.usage.enabled` | boolean | `true` | Enable/disable usage analysis |
-| `spring.boot.usage.cache-ttl` | long | `60000` | Cache TTL in milliseconds |
-| `spring.boot.usage.include-origins` | boolean | `false` | Include bean origin information |
-| `spring.boot.usage.include-confidence` | boolean | `false` | Include confidence scores |
-| `spring.boot.usage.detect-unused-jars` | boolean | `false` | Detect unused JAR files |
-| `spring.boot.usage.markdown-summary` | boolean | `false` | Generate Markdown summary file |
-| `spring.boot.usage.output-dir` | String | `null` | Directory for output files |
-| `spring.boot.usage.policies-fail-on-violation` | boolean | `false` | Fail startup on policy violations |
+| `spring.boot.usage.report.enabled` | boolean | `false` | Master switch. Enables report generation and the `bootusage` endpoint. |
+| `spring.boot.usage.report.cache-ttl` | long (ms) | `0` | Endpoint cache TTL in milliseconds. `0` regenerates the report on every request. |
+| `spring.boot.usage.report.include-origins` | boolean | `false` | Include sanitized bean origin locations in the report. |
+| `spring.boot.usage.report.include-confidence` | boolean | `false` | Include heuristic confidence scores in suggestions. |
+| `spring.boot.usage.report.detect-unused-jars` | boolean | `false` | Best-effort detection of unused JARs on the classpath. |
+| `spring.boot.usage.report.markdown-summary` | boolean | `false` | Also write a Markdown summary to the output directory. |
+| `spring.boot.usage.report.output-dir` | String | `build/boot-usage` | Output directory for persisted reports. |
+| `spring.boot.usage.report.policies-fail-on-violation` | boolean | `false` | Fail startup if any usage policy returns violations. |
+
+> The `bootusage` endpoint must also be exposed via
+> `management.endpoints.web.exposure.include=bootusage` to be reachable over HTTP.
 
 ### Example Configuration
 
 ```yaml
-management:
-  endpoint:
-    bootusage:
-      enabled: true
-
 spring:
   boot:
     usage:
-      enabled: true
-      cache-ttl: 120000
-      include-origins: true
-      detect-unused-jars: true
-      policies-fail-on-violation: false
+      report:
+        enabled: true                 # required - off by default
+        cache-ttl: 5000               # cache the report for 5s (ms); 0 = no cache
+        include-origins: true
+        detect-unused-jars: true
+        markdown-summary: true
+        output-dir: build/boot-usage
+        policies-fail-on-violation: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bootusage            # expose the endpoint over HTTP
 ```
 
 ## Usage Policies (SPI)
@@ -160,7 +244,7 @@ public class NoUnusedStartersPolicy implements UsagePolicy {
 }
 ```
 
-Register your policy via Spring's `META-INF/spring.factories` or as a bean:
+Register your policy as a Spring bean:
 
 ```java
 @Bean
@@ -169,7 +253,7 @@ public UsagePolicy noUnusedStartersPolicy() {
 }
 ```
 
-When `spring.boot.usage.policies-fail-on-violation=true`, any policy violation will cause application startup to fail.
+When `spring.boot.usage.report.policies-fail-on-violation=true`, any policy violation will cause application startup to fail.
 
 ## Requirements
 
