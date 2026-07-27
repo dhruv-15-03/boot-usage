@@ -25,12 +25,6 @@
       "description": "Include heuristic confidence scoring in suggestions."
     },
     {
-      "name": "spring.boot.usage.report.detect-unused-jars",
-      "type": "java.lang.Boolean",
-      "defaultValue": false,
-      "description": "Attempt best-effort detection of unused jars."
-    },
-    {
       "name": "spring.boot.usage.report.markdown-summary",
       "type": "java.lang.Boolean",
       "defaultValue": false,

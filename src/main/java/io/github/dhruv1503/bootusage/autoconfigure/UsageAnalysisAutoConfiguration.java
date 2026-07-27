@@ -34,14 +34,13 @@ import org.springframework.core.env.Environment;
  *   <li>Starter dependency detection and usage analysis</li>
  *   <li>Auto-configuration evaluation (beyond what /actuator/conditions provides)</li>
  *   <li>Bean origin tracking with sanitized paths</li>
- *   <li>Unused JAR detection on classpath</li>
  *   <li>Custom policy enforcement SPI</li>
  *   <li>Report persistence to disk in multiple formats</li>
  * </ul>
  * <p>
  * This feature differs from the built-in {@code /actuator/conditions} endpoint by
- * providing starter-level analysis, unused JAR detection, policy enforcement,
- * and actionable optimization suggestions.
+ * providing starter-level analysis, policy enforcement, and actionable optimization
+ * suggestions.
  *
  * @author Dhruv Rastogi
  * @since 1.0.0

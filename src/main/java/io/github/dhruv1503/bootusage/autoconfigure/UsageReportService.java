@@ -44,7 +44,6 @@ import io.github.dhruv1503.bootusage.autoconfigure.UsagePolicy.PolicyResult;
  * <ul>
  *   <li>Starter usage analysis (declared vs actually used vs unused)</li>
  *   <li>Bean origin tracking with sanitized paths</li>
- *   <li>Unused JAR detection</li>
  *   <li>Custom policy enforcement via SPI</li>
  *   <li>Report customization via SPI</li>
  *   <li>Report caching with configurable TTL</li>
@@ -190,9 +189,6 @@ public class UsageReportService {
 		if (this.properties.isIncludeOrigins()) {
 			features.add("bean-origins");
 		}
-		if (this.properties.isDetectUnusedJars()) {
-			features.add("unused-jar-detection");
-		}
 		if (this.properties.isIncludeConfidence()) {
 			features.add("confidence-scores");
 		}
@@ -209,7 +205,6 @@ public class UsageReportService {
 		config.put("enabled", this.properties.isEnabled());
 		config.put("includeOrigins", this.properties.isIncludeOrigins());
 		config.put("includeConfidence", this.properties.isIncludeConfidence());
-		config.put("detectUnusedJars", this.properties.isDetectUnusedJars());
 		config.put("markdownSummary", this.properties.isMarkdownSummary());
 		config.put("outputDir", this.properties.getOutputDir());
 		config.put("policiesFailOnViolation", this.properties.isPoliciesFailOnViolation());

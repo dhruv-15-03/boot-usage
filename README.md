@@ -97,13 +97,12 @@ curl http://localhost:8080/actuator/bootusage?force=true
     "javaVersion": "21.0.5",
     "applicationName": "my-app",
     "activeProfiles": ["default"],
-    "enabledFeatures": ["bean-origins", "unused-jar-detection"]
+    "enabledFeatures": ["bean-origins"]
   },
   "configuration": {
     "enabled": true,
     "includeOrigins": true,
     "includeConfidence": false,
-    "detectUnusedJars": true,
     "markdownSummary": false,
     "outputDir": "build/boot-usage",
     "policiesFailOnViolation": false,
@@ -183,7 +182,6 @@ curl http://localhost:8080/actuator/bootusage?force=true
 | `spring.boot.usage.report.cache-ttl` | long (ms) | `0` | Endpoint cache TTL in milliseconds. `0` regenerates the report on every request. |
 | `spring.boot.usage.report.include-origins` | boolean | `false` | Include sanitized bean origin locations in the report. |
 | `spring.boot.usage.report.include-confidence` | boolean | `false` | Include heuristic confidence scores in suggestions. |
-| `spring.boot.usage.report.detect-unused-jars` | boolean | `false` | Best-effort detection of unused JARs on the classpath. |
 | `spring.boot.usage.report.markdown-summary` | boolean | `false` | Also write a Markdown summary to the output directory. |
 | `spring.boot.usage.report.output-dir` | String | `build/boot-usage` | Output directory for persisted reports. |
 | `spring.boot.usage.report.policies-fail-on-violation` | boolean | `false` | Fail startup if any usage policy returns violations. |
@@ -201,7 +199,6 @@ spring:
         enabled: true                 # required - off by default
         cache-ttl: 5000               # cache the report for 5s (ms); 0 = no cache
         include-origins: true
-        detect-unused-jars: true
         markdown-summary: true
         output-dir: build/boot-usage
         policies-fail-on-violation: false
@@ -218,28 +215,28 @@ management:
 You can define custom policies to enforce starter usage rules. Implement the `UsagePolicy` interface:
 
 ```java
+import java.util.List;
+import java.util.Map;
+
 import io.github.dhruv1503.bootusage.autoconfigure.UsagePolicy;
-import io.github.dhruv1503.bootusage.autoconfigure.StarterUsageAnalyzer.StarterAnalysisResult;
+import io.github.dhruv1503.bootusage.autoconfigure.UsagePolicy.PolicyResult;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 public class NoUnusedStartersPolicy implements UsagePolicy {
 
     @Override
-    public String getName() {
-        return "no-unused-starters";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Ensures no unused starters are present in the application";
-    }
-
-    @Override
-    public PolicyResult evaluate(StarterAnalysisResult result) {
-        if (result.unusedStarters().isEmpty()) {
-            return PolicyResult.passed("No unused starters detected");
+    @SuppressWarnings("unchecked")
+    public PolicyResult evaluate(Map<String, Object> report,
+            ApplicationContext context, Environment environment) {
+        Map<String, Object> starters = (Map<String, Object>) report.get("starters");
+        List<Map<String, Object>> unused = (List<Map<String, Object>>) starters.get("unused");
+        if (unused.isEmpty()) {
+            return PolicyResult.ok();
         }
-        return PolicyResult.failed("Found " + result.unusedStarters().size() + 
-            " unused starters: " + result.unusedStarters());
+        return PolicyResult.violation("Found " + unused.size() + " unused starters: "
+                + unused.stream().map(starter -> starter.get("artifactId")).toList());
     }
 }
 ```
@@ -258,7 +255,7 @@ When `spring.boot.usage.report.policies-fail-on-violation=true`, any policy viol
 ## Requirements
 
 - Java 21 or later
-- Spring Boot 3.2.0 or later
+- Spring Boot 3.3.5 (the version pinned and tested by this project)
 
 ## Building from Source
 
