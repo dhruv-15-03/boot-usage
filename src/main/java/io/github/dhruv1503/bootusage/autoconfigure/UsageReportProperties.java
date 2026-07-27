@@ -17,6 +17,7 @@
 package io.github.dhruv1503.bootusage.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
  * Configuration properties for the Boot Usage Report feature.
@@ -57,9 +58,7 @@ public class UsageReportProperties {
 	private boolean includeConfidence = false;
 
 	/**
-	 * Attempt best-effort detection of unused JARs on the classpath.
-	 * Identifies JARs that don't appear to contribute any bean definitions.
-	 * Note: Runtime-only JARs (logging, serialization) are filtered out.
+	 * Compatibility field for a feature that was advertised but never implemented.
 	 */
 	private boolean detectUnusedJars = false;
 
@@ -114,10 +113,21 @@ public class UsageReportProperties {
 		this.includeConfidence = includeConfidence;
 	}
 
+	/**
+	 * @return the configured legacy value; it has no effect
+	 * @deprecated unused JAR detection is not implemented
+	 */
+	@Deprecated
+	@DeprecatedConfigurationProperty(reason = "Unused JAR detection is not implemented; this property has no effect.")
 	public boolean isDetectUnusedJars() {
 		return this.detectUnusedJars;
 	}
 
+	/**
+	 * @param detectUnusedJars the legacy value; it has no effect
+	 * @deprecated unused JAR detection is not implemented
+	 */
+	@Deprecated
 	public void setDetectUnusedJars(boolean detectUnusedJars) {
 		this.detectUnusedJars = detectUnusedJars;
 	}
